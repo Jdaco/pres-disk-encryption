@@ -1,0 +1,3 @@
+This presentation is build using [[https://github.com/yjwen/org-reveal/][org-reveal]]
+
+The presentation is written in =presentation.org= and exported to =presentation.html=
