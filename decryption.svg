@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="249px" preserveAspectRatio="none" style="width:213px;height:249px;" version="1.1" viewBox="0 0 213 249" width="213px" zoomAndPan="magnify"><defs><filter height="300%" id="f3n3c6d6opfpj" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[33dfd2550fe48de6997a9fc88e0e2855]
+entity plain--><polygon fill="#FEFECE" filter="url(#f3n3c6d6opfpj)" points="51,200,51,237.0146,131,237.0146,131,210,121,200,51,200" style="stroke: #000000; stroke-width: 1.5;"/><path d="M121,200 L121,210 L131,210 " fill="#FEFECE" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="60" x="61" y="224.0752">Plaintext</text><!--MD5=[7d4ce1de4f1d0801286e76de17e204a0]
+entity key--><rect fill="#FEFECE" filter="url(#f3n3c6d6opfpj)" height="23.0146" style="stroke: #000000; stroke-width: 1.5;" width="46" x="16" y="13"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="26" x="26" y="30.0752">Key</text><!--MD5=[948eb7ca3797e1501bbb8869daff92ce]
+entity enc--><rect fill="#FEFECE" filter="url(#f3n3c6d6opfpj)" height="37.0146" style="stroke: #A80036; stroke-width: 1.5;" width="168" x="7" y="103"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="148" x="17" y="127.0752">Encryption Algorithm</text><!--MD5=[e0aa260abba7eb1c2b37ca112eab842a]
+entity cipher--><polygon fill="#FEFECE" filter="url(#f3n3c6d6opfpj)" points="97,6,97,43.0146,191,43.0146,191,16,181,6,97,6" style="stroke: #000000; stroke-width: 1.5;"/><path d="M181,6 L181,16 L191,16 " fill="#FEFECE" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="107" y="30.0752">Ciphertext</text><!--MD5=[158e48bd923cdfe10b2513b895fc36f7]
+link cipher to enc--><path d="M134.03,43.37 C125.37,58.89 112.79,81.45 103.46,98.16 " fill="none" id="cipher-&gt;enc" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="100.92,102.71,108.8022,96.8048,103.3591,98.3453,101.8186,92.9022,100.92,102.71" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[dd9526bb6ebfe831d5af71b719940642]
+link key to enc--><path d="M44.76,36.03 C52.91,50.9 67.98,78.44 78.7,98.02 " fill="none" id="key-&gt;enc" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="81.32,102.82,80.4839,93.0067,78.9088,98.4398,73.4756,96.8647,81.32,102.82" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[0a42a4cc8c7281a6dd66ec5f594b3d80]
+link enc to plain--><path d="M91,140.37 C91,155.63 91,177.68 91,194.3 " fill="none" id="enc-&gt;plain" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="91,199.71,95,190.71,91,194.71,87,190.71,91,199.71" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[db6573876ff5bf9fb8adf5dbb5b5e3d6]
+@startuml
+file Plaintext as plain
+card Key as key
+agent "Encryption Algorithm" as enc
+file Ciphertext as cipher
+
+cipher - -> enc
+key - -> enc
+enc - -> plain
+@enduml
+
+PlantUML version 1.2020.15(Sun Jun 28 04:39:45 PDT 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

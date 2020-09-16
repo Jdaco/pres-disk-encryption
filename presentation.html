@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/theme/blood.css" id="theme"/>
+
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'https://cdn.jsdelivr.net/npm/reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-orgc11f2a8">
+<h2 id="orgc11f2a8">Disk Encryption</h2>
+<div class="outline-text-2" id="text-orgc11f2a8">
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org456c03e">
+<h3 id="org456c03e">Disclaimer</h3>
+<p>
+Assume <b>all</b> commands in this presentation could cause permanent loss of data
+</p>
+
+</section>
+<section id="slide-org456c03e-split">
+
+<p>
+System: <b>HDD</b> on a <b>BIOS</b> motherboard
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org111a9b1">
+<h3 id="org111a9b1">Storage Layers</h3>
+<div class="outline-text-3" id="text-org111a9b1">
+</div>
+</section>
+<section id="slide-org1295295">
+<h4 id="org1295295">Partitions</h4>
+</section>
+<section id="slide-org1295295-split">
+
+<div class="figure">
+<p><img src="./partition_table.png" alt="partition_table.png" />
+</p>
+</div>
+</section>
+<section id="slide-org1295295-split">
+
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>parted /dev/sda mklabel gpt
+
+parted /dev/sda mkpart SWAP linux-swap <span style="color: #f78c6c; font-weight: bold;">1MiB</span> <span style="color: #f78c6c; font-weight: bold;">1GiB</span>
+parted /dev/sda mkpart BOOT ext4 <span style="color: #f78c6c; font-weight: bold;">1GiB</span> <span style="color: #f78c6c; font-weight: bold;">2GiB</span>
+parted /dev/sda mkpart ROOT ext4 <span style="color: #f78c6c; font-weight: bold;">2GiB</span> <span style="color: #f78c6c; font-weight: bold;">100%</span>
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org1295295-split">
+
+
+<div class="figure">
+<p><img src="./partition_purpose.png" alt="partition_purpose.png" />
+</p>
+</div>
+</section>
+<section id="slide-org1295295-split">
+
+
+<div class="figure">
+<p><img src="./partition_numbers.png" alt="partition_numbers.png" />
+</p>
+</div>
+
+</section>
+<section id="slide-orgb400ade">
+<h4 id="orgb400ade">File Systems</h4>
+</section>
+<section id="slide-orgb400ade-split">
+
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>mkfs.ext4 /dev/sda2
+mkfs.ext4 /dev/sda3
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb400ade-split">
+
+<div class="figure">
+<p><img src="./partition_filesystem.png" alt="partition_filesystem.png" />
+</p>
+</div>
+</section>
+<section id="slide-orgb400ade-split">
+
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>mount /dev/sda3 /mnt
+
+ls /mnt
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb400ade-split">
+
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>$ df -h
+
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda3       <span style="color: #f78c6c; font-weight: bold;">219G</span>  <span style="color: #f78c6c; font-weight: bold;">177G</span>   <span style="color: #f78c6c; font-weight: bold;">32G</span>  <span style="color: #f78c6c; font-weight: bold;">85%</span> /
+/dev/sda2       <span style="color: #f78c6c; font-weight: bold;">256M</span>   <span style="color: #f78c6c; font-weight: bold;">93M</span>  <span style="color: #f78c6c; font-weight: bold;">164M</span>  <span style="color: #f78c6c; font-weight: bold;">37%</span> /boot
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb400ade-split">
+
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>$ cat /etc/fstab
+
+<span style="color: #676E95;"># </span><span style="color: #676E95;">Static information about the filesystems.</span>
+<span style="color: #676E95;"># </span><span style="color: #676E95;">See fstab(5) for details.</span>
+
+<span style="color: #676E95;">#</span><span style="color: #676E95;">&lt;file system&gt;  &lt;dir&gt;   &lt;type&gt;   &lt;options&gt;  &lt;dump&gt; &lt;pass&gt;</span>
+/dev/sda3       /       ext4   rw,relatime   <span style="color: #f78c6c; font-weight: bold;">0</span>      <span style="color: #f78c6c; font-weight: bold;">0</span>
+/dev/sda2       /boot   vfat   rw,relatime   <span style="color: #f78c6c; font-weight: bold;">0</span>      <span style="color: #f78c6c; font-weight: bold;">0</span>
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgf7b6f85">
+<h3 id="orgf7b6f85">Encryption</h3>
+</section>
+<section id="slide-orgf7b6f85-split">
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./encryption.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+</section>
+<section id="slide-orgf7b6f85-split">
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./decryption.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+</section>
+<section id="slide-org4eaa5ed">
+<h4 id="org4eaa5ed">dm-crypt / LUKS</h4>
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim><span style="color: #676E95;"># </span><span style="color: #676E95;">Securely erase the drive</span>
+shred /dev/sda3
+
+<span style="color: #676E95;"># </span><span style="color: #676E95;">Encrypt the partition</span>
+cryptsetup luksFormat /dev/sda3
+
+<span style="color: #676E95;"># </span><span style="color: #676E95;">--&gt; Enter Password &lt;--</span>
+
+cryptsetup open /dev/sda3 cryptroot
+
+<span style="color: #676E95;"># </span><span style="color: #676E95;">--&gt; Enter Password &lt;--</span>
+
+mkfs.ext4 /dev/mapper/cryptroot
+
+mount /dev/mapper/cryptroot /mnt
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org4eaa5ed-split">
+
+
+<div class="figure">
+<p><img src="./partitions_encrypted.png" alt="partitions_encrypted.png" />
+</p>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgb2d2946">
+<h3 id="orgb2d2946">Boot Sequence</h3>
+<ol>
+<li>Load the <b>bootloader</b></li>
+<li>Load the <b>kernel</b> and <b>initial ram disk (initrd)</b></li>
+<li>Mount the <b>root file system</b> and execute <code>init</code></li>
+
+</ol>
+
+</section>
+<section id="slide-orgb2d2946-split">
+
+
+<div class="figure">
+<p><img src="./partitions_encrypted.png" alt="partitions_encrypted.png" />
+</p>
+</div>
+
+</section>
+<section id="slide-orgb2d2946-split">
+
+<p>
+<b>Note:</b> This might be configured differently on your distro
+</p>
+
+</section>
+<section id="slide-orgb2d2946-split">
+
+
+<p>
+Configure your initrd:
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>$ grep <span style="color: #c3e88d;">'^HOOKS='</span> /etc/mkinitcpio.conf
+
+<span style="color: #ffcb6b;">HOOKS</span>=<span style="color: #c3e88d;">"base udev block autodetect keyboard modconf encrypt filesystems fsck"</span>
+
+$ mkinitcpio -P
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgb2d2946-split">
+
+<p>
+Kernel Parameters:
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>$ grep <span style="color: #c3e88d;">'^options'</span> /boot/loader/entries/arch.conf
+
+options <span style="color: #ffcb6b;">cryptdevice</span>=/dev/disk/by-uuid/b8a9981b-3746-4635-8820-7ef6b333b90c:rc <span style="color: #ffcb6b;">root</span>=/dev/mapper/rc rw
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org7729b17">
+<h3 id="org7729b17">Details</h3>
+</section>
+</section>
+<section>
+<section id="slide-org584d1bc">
+<h3 id="org584d1bc">MBR vs GPT</h3>
+</section>
+</section>
+<section>
+<section id="slide-org7476997">
+<h3 id="org7476997">BIOS vs UEFI</h3>
+</section>
+</section>
+<section>
+<section id="slide-orgab83635">
+<h3 id="orgab83635">SSDs</h3>
+<div class="outline-text-3" id="text-orgab83635">
+</div>
+</section>
+<section id="slide-org7f64279">
+<h4 id="org7f64279">Wear Leveling</h4>
+<p>
+Never <code>shred</code> on an SSD
+</p>
+
+</section>
+<section id="slide-org7f64279-split">
+
+<p>
+Use <b>Secure Erase</b>
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>hdparm --user-master u --security-set-pass $<span style="color: #c792ea;">{</span><span style="color: #ffcb6b;">PASSWORD</span><span style="color: #c792ea;">}</span> /dev/sda
+hdparm --user-master u --security-erase $<span style="color: #c792ea;">{</span><span style="color: #ffcb6b;">PASSWORD</span><span style="color: #c792ea;">}</span> /dev/sda
+</code></pre>
+</div>
+</section>
+<section id="slide-org6236dc8">
+<h4 id="org6236dc8">Compression</h4>
+<p>
+Some drives have automatic compression to improve performance
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org94bb8e6">
+<h3 id="org94bb8e6">NVME Drives</h3>
+<p>
+If you have an NVME SSD, your device paths will look like this:
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-shell"><code trim>$ lsblk
+
+NAME        MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+nvme0n1     <span style="color: #f78c6c; font-weight: bold;">259:0</span>    <span style="color: #f78c6c; font-weight: bold;">0</span> <span style="color: #f78c6c; font-weight: bold;">238.5G</span>  <span style="color: #f78c6c; font-weight: bold;">0</span> disk  
+&#9500;&#9472;nvme0n1p1 <span style="color: #f78c6c; font-weight: bold;">259:1</span>    <span style="color: #f78c6c; font-weight: bold;">0</span>   <span style="color: #f78c6c; font-weight: bold;">260M</span>  <span style="color: #f78c6c; font-weight: bold;">0</span> part  /boot
+&#9500;&#9472;nvme0n1p2 <span style="color: #f78c6c; font-weight: bold;">259:2</span>    <span style="color: #f78c6c; font-weight: bold;">0</span>    <span style="color: #f78c6c; font-weight: bold;">16M</span>  <span style="color: #f78c6c; font-weight: bold;">0</span> part  
+&#9500;&#9472;nvme0n1p3 <span style="color: #f78c6c; font-weight: bold;">259:3</span>    <span style="color: #f78c6c; font-weight: bold;">0</span>  <span style="color: #f78c6c; font-weight: bold;">1000M</span>  <span style="color: #f78c6c; font-weight: bold;">0</span> part  /
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org7a3e5db">
+<h3 id="org7a3e5db">GParted</h3>
+
+<div class="figure">
+<p><img src="./gparted.png" alt="gparted.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org5f77940">
+<h3 id="org5f77940">Dual Booting</h3>
+
+</section>
+</section>
+<section>
+<section id="slide-org73b5474">
+<h3 id="org73b5474">Questions?</h3>
+</section>
+</section>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'https://cdn.jsdelivr.net/npm/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+ { src: 'https://cdn.jsdelivr.net/npm/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'https://cdn.jsdelivr.net/npm/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'https://cdn.jsdelivr.net/npm/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+ { src: 'https://cdn.jsdelivr.net/npm/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

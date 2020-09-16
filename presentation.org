@@ -1,0 +1,206 @@
+#+REVEAL_ROOT: https://cdn.jsdelivr.net/npm/reveal.js
+#+REVEAL_HLEVEL: 2
+#+OPTIONS: toc:nil reveal_title_slide:nil
+#+REVEAL_THEME: blood
+#+REVEAL_TRANS: linear
+
+* Disk Encryption
+** Disclaimer
+Assume *all* commands in this presentation could cause permanent loss of data
+
+#+REVEAL: split
+
+System: *HDD* on a *BIOS* motherboard
+** Storage Layers
+*** Partitions
+
+#+REVEAL: split
+[[./partition_table.png]]
+#+REVEAL: split
+
+#+BEGIN_SRC shell
+parted /dev/sda mklabel gpt
+
+parted /dev/sda mkpart SWAP linux-swap 1MiB 1GiB
+parted /dev/sda mkpart BOOT ext4 1GiB 2GiB
+parted /dev/sda mkpart ROOT ext4 2GiB 100%
+#+END_SRC
+
+#+REVEAL: split
+
+[[./partition_purpose.png]]
+#+REVEAL: split
+
+[[./partition_numbers.png]]
+
+*** File Systems
+
+#+REVEAL: split
+
+#+BEGIN_SRC shell
+mkfs.ext4 /dev/sda2
+mkfs.ext4 /dev/sda3
+#+END_SRC
+
+#+REVEAL: split
+[[./partition_filesystem.png]]
+#+REVEAL: split
+
+#+BEGIN_SRC shell
+mount /dev/sda3 /mnt
+
+ls /mnt
+#+END_SRC
+
+#+REVEAL: split
+
+ #+BEGIN_SRC shell
+$ df -h
+
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda3       219G  177G   32G  85% /
+/dev/sda2       256M   93M  164M  37% /boot
+ #+END_SRC
+
+ #+REVEAL: split
+
+ #+BEGIN_SRC shell
+$ cat /etc/fstab
+
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+#<file system>  <dir>   <type>   <options>  <dump> <pass>
+/dev/sda3       /       ext4   rw,relatime   0      0
+/dev/sda2       /boot   vfat   rw,relatime   0      0
+ #+END_SRC
+** Encryption
+   :PROPERTIES:
+   :EXPORT_REVEAL_THEME: moon
+   :END:
+
+#+REVEAL: split
+
+#+BEGIN_SRC plantuml :file ./encryption.svg
+file Plaintext as plain
+card Key as key
+agent "Encryption Algorithm" as enc
+file Ciphertext as cipher
+
+plain --> enc
+key --> enc
+enc --> cipher
+#+END_SRC
+
+#+RESULTS:
+[[file:./encryption.svg]]
+
+#+REVEAL: split
+
+#+BEGIN_SRC plantuml :file ./decryption.svg
+file Plaintext as plain
+card Key as key
+agent "Encryption Algorithm" as enc
+file Ciphertext as cipher
+
+cipher --> enc
+key --> enc
+enc --> plain
+#+END_SRC
+
+#+RESULTS:
+[[file:./decryption.svg]]
+
+*** dm-crypt / LUKS
+#+BEGIN_SRC shell
+# Securely erase the drive
+shred /dev/sda3
+
+# Encrypt the partition
+cryptsetup luksFormat /dev/sda3
+
+# --> Enter Password <--
+
+cryptsetup open /dev/sda3 cryptroot
+
+# --> Enter Password <--
+
+mkfs.ext4 /dev/mapper/cryptroot
+
+mount /dev/mapper/cryptroot /mnt
+#+END_SRC
+
+#+REVEAL: split
+
+[[./partitions_encrypted.png]]
+** Boot Sequence
+1. Load the *bootloader*
+2. Load the *kernel* and *initial ram disk (initrd)*
+3. Mount the *root file system* and execute ~init~
+
+#+REVEAL: split
+
+[[./partitions_encrypted.png]]
+
+#+REVEAL: split
+
+*Note:* This might be configured differently on your distro
+
+#+REVEAL: split
+
+
+Configure your initrd:
+#+BEGIN_SRC shell
+$ grep '^HOOKS=' /etc/mkinitcpio.conf
+
+HOOKS="base udev block autodetect keyboard modconf encrypt filesystems fsck"
+
+$ mkinitcpio -P
+#+END_SRC
+
+#+REVEAL: split
+
+Kernel Parameters:
+#+BEGIN_SRC shell
+$ grep '^options' /boot/loader/entries/arch.conf
+
+options cryptdevice=/dev/disk/by-uuid/b8a9981b-3746-4635-8820-7ef6b333b90c:rc root=/dev/mapper/rc rw
+#+END_SRC
+
+** Details
+** MBR vs GPT
+** BIOS vs UEFI
+** SSDs
+*** Wear Leveling
+Never ~shred~ on an SSD
+
+#+REVEAL: split
+
+Use *Secure Erase*
+#+BEGIN_SRC shell
+hdparm --user-master u --security-set-pass ${PASSWORD} /dev/sda
+hdparm --user-master u --security-erase ${PASSWORD} /dev/sda
+#+END_SRC
+*** Compression
+Some drives have automatic compression to improve performance
+
+** NVME Drives
+If you have an NVME SSD, your device paths will look like this:
+#+REVEAL: skip
+
+#+BEGIN_SRC shell
+$ lsblk
+
+NAME        MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+nvme0n1     259:0    0 238.5G  0 disk  
+├─nvme0n1p1 259:1    0   260M  0 part  /boot
+├─nvme0n1p2 259:2    0    16M  0 part  
+├─nvme0n1p3 259:3    0  1000M  0 part  /
+#+END_SRC
+
+** GParted
+[[./gparted.png]]
+
+** Dual Booting
+
+** Questions?
